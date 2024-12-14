@@ -1,86 +1,59 @@
-<!doctype html>
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1" >
-  <title>browser-proxy</title>
+  <title>Simple Web Browser</title>
   <style>
-    html, body {
+    body {
+      font-family: Arial, sans-serif;
+    }
+    #browser {
       margin: 0;
       padding: 0;
+      width: 100%;
+      height: 100vh;
     }
-    body {
-      height: 100%;
+    #urlBar {
+      display: flex;
+      margin-bottom: 10px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
     }
     iframe {
+      width: 100%;
+      height: calc(100vh - 50px);
       border: none;
-      width: 50%;
-      height: 100%;
-      position: absolute;
-    }
-    iframe#new {
-      left: 50%;
     }
   </style>
 </head>
 <body>
-  <iframe id="old" src=""></iframe>
-  <iframe id="new" src=""></iframe>
+  <div id="urlBar">
+    <input type="text" id="url" placeholder="Enter URL" />
+    <button onclick="navigate()">Go</button>
+  </div>
+  <iframe id="browser"></iframe>
 
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
   <script>
-  (function ($) {
-    var NULL_MAPPING_URL = 'http://4.bp.blogspot.com/_CBk-5X4QQvQ/TH-kNuQ8GpI/AAAAAAAAB7U/BzXdt6teQe8/s1600/Cat-fixes-your-computer.jpg';
-    var NO_MAPPINGS_URL = 'http://4.bp.blogspot.com/_CBk-5X4QQvQ/TH-kNuQ8GpI/AAAAAAAAB7U/BzXdt6teQe8/s1600/Cat-fixes-your-computer.jpg';
-
-    var curUrl;
-    var offDomainWarning = "You've now navigated off the chosen domain. No updates will occur to the right-hand panel.";
-    var shownOffDomainWarning = false;
-
-    function updateFrame(url) {
-      $.getJSON('/__mapping__/api/mappings.json', {old_url: url})
-        .then(function (data) {
-          var m;
-          if (typeof data.mappings !== 'undefined' && data.mappings.length > 0) {
-            m = data.mappings[0].mapping.new_url;
-          } else {
-            m = NO_MAPPINGS_URL;
-          }
-          if (m == null) {
-            m = NULL_MAPPING_URL;
-          }
-          $('#new').attr('src', m);
-        });
-    }
-
-    function updateUrl() {
-      url = $('#old')[0].contentWindow.location.pathname;
-      
-      if (url === 'blank') { return; }
-      if (url === curUrl) { return; }
-      curUrl = url;
-
-      if (typeof url === 'undefined') {
-        if (shownOffDomainWarning) { return; }
-
-        if (confirm(offDomainWarning)) {
-          location.href = '/__browser__';
-        } else {
-          shownOffDomainWarning = true;
-        }
-      } else {
-        updateFrame(url);
-        console.log(url);
-        history.pushState({}, "", '/__browser__' + url);      
+    function navigate() {
+      var url = document.getElementById('url').value;
+      if (!url.startsWith('http')) {
+        url = 'http://' + url;
       }
+      document.getElementById('browser').src = url;
     }
-
-    function init() {
-      $('#old').attr('src', window.location.pathname.replace(/^\/__browser__/, "") || '/');
-      updateTimer = setInterval(updateUrl, 500);
-    }
-
-    $(init);
-  }(jQuery));
   </script>
 </body>
-<html>
+</html>
